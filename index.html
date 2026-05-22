@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Popelivka sibiřská – interaktivní mapa genetické diverzity</title>
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
@@ -269,6 +268,10 @@
             opacity: 0.65;
         }
 
+        .sidebar-header .reset-btn {
+            display: none; /* Skryjeme tlačítko v hlavičce, ukáže se jen v info-boxu */
+        }
+
         .site-header {
             display: flex;
             align-items: baseline;
@@ -445,7 +448,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Kontejner pro dvojici obrázků PCoA */
         .pcoa-images {
             display: flex;
             gap: 1rem;
@@ -465,19 +467,9 @@
             font-weight: 500;
         }
 
-        .pcoa-box img {
+        .pcoa-box img, .graph-card img {
             width: 100%;
-            height: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
-            object-fit: contain;
-            background-color: #0a0f14;
-        }
-
-        /* Jednotlivé obrázky v ostatních kartách */
-        .graph-card img {
-            width: 100%;
+            max-width: 100%;
             height: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.02);
@@ -509,28 +501,32 @@
             border-top-color: #4b5e78;
         }
 
+        /* OPRAVA RESPONSIVITY PRO MOBILY */
         @media (max-width: 900px) {
             .main-container {
                 flex-direction: column;
-                height: auto;
+                height: auto; /* Zrušíme fixní výšku celého kontejneru */
             }
             #map-wrapper {
-                flex: 1 1 55%;
+                flex: none;
+                width: 100%;
+                height: 450px; /* MAPA DOSTANE PEVNOU VÝŠKU NA MOBILU */
                 border-right: none;
                 border-bottom: 2px solid var(--border);
             }
+            #map {
+                height: 100%; /* Vyplní map-wrapper */
+            }
             #sidebar {
-                flex: 0 0 auto;
+                flex: none;
                 width: 100%;
                 height: auto;
-                max-height: 60vh;
+                max-height: none; /* Necháme sidebar roztáhnout podle obsahu */
+                overflow: visible;
             }
             .sidebar-content {
-                padding: 1rem 1.2rem;
-            }
-            .reset-btn {
-                right: 1.2rem;
-                top: 1rem;
+                padding: 1.5rem 1.2rem;
+                overflow: visible;
             }
             .graphs-grid {
                 grid-template-columns: 1fr;
@@ -605,7 +601,7 @@
                     </details>
                     <details>
                         <summary><strong>Ap</strong> (Privátní alely)</summary>
-                        <div class="glossary-def">Počet alel, které se vyskytují pouze v této jediné populaci. Značí unikátnost lokality.</div>
+                        <div class="glossary-def">Počet alel, které se vyskytují pouze v této jedinou populaci. Značí unikátnost lokality.</div>
                     </details>
                     <details>
                         <summary><strong>Ar</strong> (Alelická bohatost)</summary>
@@ -616,11 +612,9 @@
         </div>
     </div>
 
-    <!-- SEKCE S GRAFY (cesty opraveny pro root) -->
     <div class="global-graphs-section">
         <h2>📊 Výsledky genetické analýzy</h2>
         <div class="graphs-grid">
-            <!-- PCoA karta se dvěma obrázky vedle sebe -->
             <div class="graph-card">
                 <h3>Graf PCoA (analýza hlavních koordinát)</h3>
                 <div class="pcoa-images">
@@ -638,7 +632,6 @@
                 </p>
             </div>
 
-            <!-- Mantelův test -->
             <div class="graph-card">
                 <h3>Mantelův test (izolace vzdáleností)</h3>
                 <img src="mantel.png" alt="Mantelův test" loading="lazy">
@@ -647,12 +640,11 @@
                 </p>
             </div>
 
-            <!-- He vs. Ho -->
             <div class="graph-card">
                 <h3>Porovnání heterozygotnosti (Graf He vs. Ho)</h3>
                 <img src="he_ho_comparison.png" alt="He vs Ho" loading="lazy">
                 <p class="graph-caption">
-                    Vztah mezi očekávanou (He) a pozorovanou (Ho) heterozygozitou. Párový t-test neprokázal celkově statisticky významný rozdíl mezi He a Ho (p = 0,67), což značí, že většina populací se nachází ve stavu blízkém Hardy-Weinbergově rovnováze. Většina lokalit vykazuje záporné hodnoty inbreedingového koeficientu (FIS), což značí nadbytek heterozygotů. Extrémní hodnoty u slovenských populací (LIT) jsou dány malým rozsahem výběru (n ≤ 3). Populace Olšina (OLS) vykazuje extrémní pokles alelické bohatosti (Ar = 1,222) a přítomnost pouhých 2 MLG u 13 jedinců, což potvrzuje silný efekt zakladatele.
+                    Vztah mezi očekávanou (He) a pozorovanou (Ho) heterozygozitou. Párový t-test neprokázal celkově statisticky významný rozdíl mezi He a Ho (p = 0,67), což značí, že většina populací se nachází ve stavu blízkém Hardy-Weinbergově rovnováze. Většina lokalit vykazuje záporné hodnoty inbreedingového koeficientu (FIS), což značí nadbytek heterozygotů. Extrémní hodnoty u slovenských populací (LIT) jsou dány malým rozsahem výběru (n ≤ 3). Populace Olšina (OLS) vykazuje extrémní pokles alelické bohatosti (Ar = 1,222) and přítomnost pouhých 2 MLG u 13 jedinců, což potvrzuje silný efekt zakladatele.
                 </p>
             </div>
         </div>
@@ -734,7 +726,6 @@
             const infoBox = document.getElementById('info-box');
             const resetBtn = document.getElementById('reset-selection');
             let selectedSiteId = null;
-            let ignoreMapClick = false;
 
             function resetAllMarkersStyle() {
                 sites.forEach(site => {
@@ -833,12 +824,19 @@
                 showPlaceholder();
             }
 
+            resetBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clearSelection();
+            });
+
+            map.on('click', function() {
+                clearSelection();
+            });
+
             sites.forEach(site => {
                 if (!site._marker) return;
                 site._marker.on('click', function(e) {
                     L.DomEvent.stopPropagation(e.originalEvent);
-                    ignoreMapClick = true;
-                    setTimeout(() => { ignoreMapClick = false; }, 50);
 
                     if (selectedSiteId === site.id) {
                         clearSelection();
@@ -850,14 +848,6 @@
                     selectedSiteId = site.id;
                 });
             });
-
-            map.on('click', function() {
-                if (ignoreMapClick) return;
-                if (selectedSiteId) clearSelection();
-            });
-
-            resetBtn.addEventListener('click', clearSelection);
-            showPlaceholder();
         });
     </script>
 </body>
