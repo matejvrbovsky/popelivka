@@ -320,7 +320,6 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Statistické varování pro nízké n */
         .stat-warning-box {
             background: var(--warning-amber-bg);
             border-left: 3px solid var(--warning-amber-border);
@@ -405,7 +404,7 @@
             line-height: 1.5;
         }
 
-        /* ========== GLOBÁLNÍ GRAFY POD MAPOU ========== */
+        /* ========== GLOBÁLNÍ GRAFY ========== */
         .global-graphs-section {
             max-width: 1600px;
             margin: 0 auto;
@@ -446,6 +445,37 @@
             margin-bottom: 1rem;
         }
 
+        /* Kontejner pro dvojici obrázků PCoA */
+        .pcoa-images {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pcoa-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pcoa-box .pcoa-label {
+            font-size: 0.8rem;
+            color: #8e9fb4;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .pcoa-box img {
+            width: 100%;
+            height: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            object-fit: contain;
+            background-color: #0a0f14;
+        }
+
+        /* Jednotlivé obrázky v ostatních kartách */
         .graph-card img {
             width: 100%;
             height: auto;
@@ -504,6 +534,9 @@
             }
             .graphs-grid {
                 grid-template-columns: 1fr;
+            }
+            .pcoa-images {
+                flex-direction: column;
             }
         }
     </style>
@@ -583,27 +616,41 @@
         </div>
     </div>
 
-    <!-- NOVÁ SEKCE S GRAFY -->
+    <!-- SEKCE S GRAFY (cesty opraveny pro root) -->
     <div class="global-graphs-section">
         <h2>📊 Výsledky genetické analýzy</h2>
         <div class="graphs-grid">
+            <!-- PCoA karta se dvěma obrázky vedle sebe -->
             <div class="graph-card">
                 <h3>Graf PCoA (analýza hlavních koordinát)</h3>
-                <img src="grafy/pcoa.png" alt="PCoA graf" loading="lazy">
+                <div class="pcoa-images">
+                    <div class="pcoa-box">
+                        <span class="pcoa-label">Osy 1 a 2</span>
+                        <img src="pcoa_12.png" alt="PCoA osy 1 a 2" loading="lazy">
+                    </div>
+                    <div class="pcoa-box">
+                        <span class="pcoa-label">Osy 1 a 3</span>
+                        <img src="pcoa_13.png" alt="PCoA osy 1 a 3" loading="lazy">
+                    </div>
+                </div>
                 <p class="graph-caption">
                     PCoA populací Ligularia sibirica na základě Neiho genetické vzdálenosti. Analýza jasně odděluje slovenské populace (SD, LIT, SAL) od homogennějšího shluku českých populací, což potvrzuje vysokou diferenciaci mezi státy (ΦCT = 0,302) způsobenou historickou izolací a horským terénem. Výraznou genetickou anomálií je česká populace Olšina (OLS) a v menší míře Slunečný dvůr (SLD) a Louky u Robeče (LRP), které vyčnívají mimo hlavní český klastr.
                 </p>
             </div>
+
+            <!-- Mantelův test -->
             <div class="graph-card">
                 <h3>Mantelův test (izolace vzdáleností)</h3>
-                <img src="grafy/mantel.png" alt="Mantelův test" loading="lazy">
+                <img src="mantel.png" alt="Mantelův test" loading="lazy">
                 <p class="graph-caption">
                     Mantelův test závislosti mezi logaritmovanou geografickou vzdáleností a Neiho genetickou vzdáleností mezi populacemi. Výsledek ukazuje nízkou až střední pozitivní korelaci (r = 0,329; p = 0,026), což potvrzuje přítomnost mírného efektu izolace vzdáleností (IBD). Skutečnost, že i geograficky velmi vzdálené populace vykazují genetickou podobnost, lze vysvětlit historickým postglaciálním rozložením mokřadů a dlouhověkostí popelivky sibiřské.
                 </p>
             </div>
+
+            <!-- He vs. Ho -->
             <div class="graph-card">
                 <h3>Porovnání heterozygotnosti (Graf He vs. Ho)</h3>
-                <img src="grafy/he_ho_comparison.png" alt="He vs Ho" loading="lazy">
+                <img src="he_ho_comparison.png" alt="He vs Ho" loading="lazy">
                 <p class="graph-caption">
                     Vztah mezi očekávanou (He) a pozorovanou (Ho) heterozygozitou. Párový t-test neprokázal celkově statisticky významný rozdíl mezi He a Ho (p = 0,67), což značí, že většina populací se nachází ve stavu blízkém Hardy-Weinbergově rovnováze. Většina lokalit vykazuje záporné hodnoty inbreedingového koeficientu (FIS), což značí nadbytek heterozygotů. Extrémní hodnoty u slovenských populací (LIT) jsou dány malým rozsahem výběru (n ≤ 3). Populace Olšina (OLS) vykazuje extrémní pokles alelické bohatosti (Ar = 1,222) a přítomnost pouhých 2 MLG u 13 jedinců, což potvrzuje silný efekt zakladatele.
                 </p>
