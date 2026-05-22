@@ -33,13 +33,16 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            min-height: 100dvh;
             overflow-x: hidden;
             overflow-y: auto;
         }
@@ -48,13 +51,12 @@
             display: flex;
             width: 100%;
             height: 100vh;
+            height: 100dvh;
             max-width: 1600px;
             margin: 0 auto;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            border-radius: 0;
             overflow: hidden;
             background: #181e26;
-            flex-shrink: 0;
         }
 
         #map-wrapper {
@@ -63,6 +65,7 @@
             flex-direction: column;
             min-width: 0;
             border-right: 2px solid var(--border);
+            min-height: 0;
         }
 
         .map-title {
@@ -81,6 +84,7 @@
         #map {
             flex: 1;
             width: 100%;
+            min-height: 0;
             z-index: 1;
         }
 
@@ -91,7 +95,7 @@
             color: #cdd6e0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            /* výšku necháváme na flexu rodiče, žádné explicitní height */
             overflow: hidden;
             box-shadow: inset 2px 0 10px rgba(0, 0, 0, 0.4);
             z-index: 2;
@@ -153,6 +157,7 @@
             padding: 1.6rem 1.5rem 2rem 1.5rem;
             scrollbar-width: thin;
             scrollbar-color: #3b4452 transparent;
+            -webkit-overflow-scrolling: touch;
         }
 
         .sidebar-content::-webkit-scrollbar {
@@ -266,10 +271,6 @@
             display: block;
             margin-bottom: 0.6rem;
             opacity: 0.65;
-        }
-
-        .sidebar-header .reset-btn {
-            display: none; /* Skryjeme tlačítko v hlavičce, ukáže se jen v info-boxu */
         }
 
         .site-header {
@@ -407,14 +408,13 @@
             line-height: 1.5;
         }
 
-        /* ========== GLOBÁLNÍ GRAFY ========== */
+        /* Globální grafy */
         .global-graphs-section {
             max-width: 1600px;
             margin: 0 auto;
             padding: 2rem 2rem 3rem;
             width: 100%;
             background: #0f141c;
-            flex-shrink: 0;
         }
 
         .global-graphs-section h2 {
@@ -458,6 +458,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .pcoa-box .pcoa-label {
@@ -467,16 +468,19 @@
             font-weight: 500;
         }
 
-        .pcoa-box img, .graph-card img {
+        .pcoa-box img,
+        .graph-card img {
             width: 100%;
-            max-width: 100%;
             height: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.02);
             border-radius: 8px;
-            margin-bottom: 1rem;
             object-fit: contain;
             background-color: #0a0f14;
+        }
+
+        .graph-card img {
+            margin-bottom: 1rem;
         }
 
         .graph-caption {
@@ -501,38 +505,50 @@
             border-top-color: #4b5e78;
         }
 
-        /* OPRAVA RESPONSIVITY PRO MOBILY */
+        /* Responzivní mobilní zobrazení */
         @media (max-width: 900px) {
+            body {
+                overflow-y: auto; /* povolit scroll celé stránky */
+            }
+
             .main-container {
                 flex-direction: column;
-                height: auto; /* Zrušíme fixní výšku celého kontejneru */
+                height: 100vh;
+                height: 100dvh;
             }
+
             #map-wrapper {
-                flex: none;
-                width: 100%;
-                height: 450px; /* MAPA DOSTANE PEVNOU VÝŠKU NA MOBILU */
+                flex: 1 1 55%;
+                min-height: 300px;
                 border-right: none;
                 border-bottom: 2px solid var(--border);
             }
-            #map {
-                height: 100%; /* Vyplní map-wrapper */
-            }
+
             #sidebar {
-                flex: none;
+                flex: 0 0 45%;
                 width: 100%;
-                height: auto;
-                max-height: none; /* Necháme sidebar roztáhnout podle obsahu */
-                overflow: visible;
+                overflow: hidden;
             }
+
             .sidebar-content {
-                padding: 1.5rem 1.2rem;
-                overflow: visible;
+                padding: 1rem 1.2rem;
             }
+
+            .reset-btn {
+                right: 1.2rem;
+                top: 1rem;
+            }
+
             .graphs-grid {
                 grid-template-columns: 1fr;
             }
+
             .pcoa-images {
                 flex-direction: column;
+            }
+
+            .global-graphs-section {
+                padding: 1.5rem 1rem;
             }
         }
     </style>
@@ -564,9 +580,7 @@
                     </div>
                     <p class="soc-desc">
                         Tato mapa zobrazuje výhradně populace, které byly aktivně zkoumány v rámci této práce. Nejedná se
-                        o kompletní výčet všech existujících lokalit Popelivky sibiřské na území ČR a SR. Cílem aplikace je
-                        vizualizace prostorového rozložení genetické variability ohroženého glaciálního reliktu pomocí
-                        mikrosatelitových markerů.
+                        o kompletní výčet všech existujících lokalit Popelivky sibiřské na území ČR a SR.
                     </p>
                 </div>
 
@@ -585,27 +599,27 @@
                     </details>
                     <details>
                         <summary><strong>MLG</strong> (Multilocus Genotypes)</summary>
-                        <div class="glossary-def">Počet unikátních genetických typů. Nízký počet značí klonální šíření nebo drastickou ztrátu variability.</div>
+                        <div class="glossary-def">Počet unikátních genetických typů.</div>
                     </details>
                     <details>
                         <summary><strong>He</strong> (Očekávaná heterozygotnost)</summary>
-                        <div class="glossary-def">Genetická diverzita populace (teoretický podíl heterozygotů při náhodném páření). Vyšší číslo = vyšší fitness populace.</div>
+                        <div class="glossary-def">Genetická diverzita populace.</div>
                     </details>
                     <details>
                         <summary><strong>Ho</strong> (Pozorovaná heterozygotnost)</summary>
-                        <div class="glossary-def">Skutečně naměřený podíl heterozygotních jedinců.</div>
+                        <div class="glossary-def">Skutečně naměřený podíl heterozygotů.</div>
                     </details>
                     <details>
                         <summary><strong>F<sub>IS</sub></strong> (Inbreedingový koeficient)</summary>
-                        <div class="glossary-def">Míra příbuzenského křížení. Kladné hodnoty značí inbreeding (nedostatek heterozygotů), záporné hodnoty značí nadbytek heterozygotů.</div>
+                        <div class="glossary-def">Míra příbuzenského křížení.</div>
                     </details>
                     <details>
                         <summary><strong>Ap</strong> (Privátní alely)</summary>
-                        <div class="glossary-def">Počet alel, které se vyskytují pouze v této jedinou populaci. Značí unikátnost lokality.</div>
+                        <div class="glossary-def">Počet alel pouze v dané populaci.</div>
                     </details>
                     <details>
                         <summary><strong>Ar</strong> (Alelická bohatost)</summary>
-                        <div class="glossary-def">Počet alel standardizovaný na velikost vzorku, určující schopnost populace dlouhodobě přežít a adaptovat se.</div>
+                        <div class="glossary-def">Počet alel standardizovaný na velikost vzorku.</div>
                     </details>
                 </div>
             </div>
@@ -620,32 +634,24 @@
                 <div class="pcoa-images">
                     <div class="pcoa-box">
                         <span class="pcoa-label">Osy 1 a 2</span>
-                        <img src="pcoa_12.png" alt="PCoA osy 1 a 2" loading="lazy">
+                        <img src="pcoa_12.png" alt="PCoA 12" loading="lazy">
                     </div>
                     <div class="pcoa-box">
                         <span class="pcoa-label">Osy 1 a 3</span>
-                        <img src="pcoa_13.png" alt="PCoA osy 1 a 3" loading="lazy">
+                        <img src="pcoa_13.png" alt="PCoA 13" loading="lazy">
                     </div>
                 </div>
-                <p class="graph-caption">
-                    PCoA populací Ligularia sibirica na základě Neiho genetické vzdálenosti. Analýza jasně odděluje slovenské populace (SD, LIT, SAL) od homogennějšího shluku českých populací, což potvrzuje vysokou diferenciaci mezi státy (ΦCT = 0,302) způsobenou historickou izolací a horským terénem. Výraznou genetickou anomálií je česká populace Olšina (OLS) a v menší míře Slunečný dvůr (SLD) a Louky u Robeče (LRP), které vyčnívají mimo hlavní český klastr.
-                </p>
+                <p class="graph-caption">PCoA populací Ligularia sibirica na základě Neiho genetické vzdálenosti...</p>
             </div>
-
             <div class="graph-card">
-                <h3>Mantelův test (izolace vzdáleností)</h3>
-                <img src="mantel.png" alt="Mantelův test" loading="lazy">
-                <p class="graph-caption">
-                    Mantelův test závislosti mezi logaritmovanou geografickou vzdáleností a Neiho genetickou vzdáleností mezi populacemi. Výsledek ukazuje nízkou až střední pozitivní korelaci (r = 0,329; p = 0,026), což potvrzuje přítomnost mírného efektu izolace vzdáleností (IBD). Skutečnost, že i geograficky velmi vzdálené populace vykazují genetickou podobnost, lze vysvětlit historickým postglaciálním rozložením mokřadů a dlouhověkostí popelivky sibiřské.
-                </p>
+                <h3>Mantelův test</h3>
+                <img src="mantel.png" alt="Mantel" loading="lazy">
+                <p class="graph-caption">Mantelův test (r = 0,329; p = 0,026) ukazuje mírnou pozitivní korelaci.</p>
             </div>
-
             <div class="graph-card">
-                <h3>Porovnání heterozygotnosti (Graf He vs. Ho)</h3>
+                <h3>Porovnání He vs. Ho</h3>
                 <img src="he_ho_comparison.png" alt="He vs Ho" loading="lazy">
-                <p class="graph-caption">
-                    Vztah mezi očekávanou (He) a pozorovanou (Ho) heterozygozitou. Párový t-test neprokázal celkově statisticky významný rozdíl mezi He a Ho (p = 0,67), což značí, že většina populací se nachází ve stavu blízkém Hardy-Weinbergově rovnováze. Většina lokalit vykazuje záporné hodnoty inbreedingového koeficientu (FIS), což značí nadbytek heterozygotů. Extrémní hodnoty u slovenských populací (LIT) jsou dány malým rozsahem výběru (n ≤ 3). Populace Olšina (OLS) vykazuje extrémní pokles alelické bohatosti (Ar = 1,222) and přítomnost pouhých 2 MLG u 13 jedinců, což potvrzuje silný efekt zakladatele.
-                </p>
+                <p class="graph-caption">Většina populací je blízko H-W rovnováze (p = 0,67).</p>
             </div>
         </div>
     </div>
@@ -726,6 +732,7 @@
             const infoBox = document.getElementById('info-box');
             const resetBtn = document.getElementById('reset-selection');
             let selectedSiteId = null;
+            let ignoreMapClick = false;
 
             function resetAllMarkersStyle() {
                 sites.forEach(site => {
@@ -824,19 +831,12 @@
                 showPlaceholder();
             }
 
-            resetBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                clearSelection();
-            });
-
-            map.on('click', function() {
-                clearSelection();
-            });
-
             sites.forEach(site => {
                 if (!site._marker) return;
                 site._marker.on('click', function(e) {
                     L.DomEvent.stopPropagation(e.originalEvent);
+                    ignoreMapClick = true;
+                    setTimeout(() => { ignoreMapClick = false; }, 50);
 
                     if (selectedSiteId === site.id) {
                         clearSelection();
@@ -848,6 +848,14 @@
                     selectedSiteId = site.id;
                 });
             });
+
+            map.on('click', function() {
+                if (ignoreMapClick) return;
+                if (selectedSiteId) clearSelection();
+            });
+
+            resetBtn.addEventListener('click', clearSelection);
+            showPlaceholder();
         });
     </script>
 </body>
